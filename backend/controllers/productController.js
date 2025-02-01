@@ -16,7 +16,9 @@ const checkProduct = async (req, res) => {
     const product = await Product.findOne({ productName: productName });
     if (product) {
       console.log("Product exists");
-      checkExpiration(productName);
+      const expiration = JSON.parse(await checkExpiration(productName));
+
+      console.log(expiration);
     } else {
       console.log("Product does not exist");
     }
