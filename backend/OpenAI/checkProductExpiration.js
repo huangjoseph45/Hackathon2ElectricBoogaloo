@@ -8,10 +8,14 @@ const openai = new OpenAI({
 });
 
 const responseFormat = z.object({
-  foodName: z.string(),
-  isSafe: z.boolean(),
-  estimatedSafetyDate: z.string(),
-  explanation: z.string(),
+  items: z.array(
+    z.object({
+      foodName: z.string(),
+      isSafe: z.boolean(),
+      estimatedSafetyDate: z.string(),
+      explanation: z.string(),
+    })
+  ),
 });
 
 // Helper function that races a promise against a timeout
@@ -36,24 +40,26 @@ const checkExpiration = async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant. You will evaluate the safety of the following foods following or shortly before their expiration. Today's date is ${date.toDateString()}`,
+            content: `You are a helpful assistant. You will evaluate the safety of the following foods and output a valid JSON array with evaluation details. Today's date is ${date.toDateString()}. Ensure the output is valid JSON.`,
           },
           {
             role: "user",
-            content: `Food Item: ${req}`,
+            content: `Food Items: ${req}`,
           },
         ],
         temperature: 0.2,
-        max_tokens: 150,
+        max_tokens: 300, // Increased from 150 to allow a complete response
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
         response_format: zodResponseFormat(responseFormat, "expiration"),
       }),
-      5000 // 5 seconds
+      15000 // Timeout in milliseconds (15 seconds)
     );
 
-    return response.choices[0].message.content;
+    // Return an array of responses (each response is the content of a choice)
+    const choiceMap = response.choices.map((choice) => choice.message.content);
+    return JSON.parse(choiceMap).items;
   } catch (error) {
     console.error("Caught Error:", error);
     return {

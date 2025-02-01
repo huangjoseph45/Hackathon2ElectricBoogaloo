@@ -2,26 +2,24 @@ require("dotenv").config();
 
 const mongoose = require("mongoose");
 const Product = require("../schemas/Product.js");
+const ExpirationInfo = require("../schemas/ExpirationInfo.js");
 const { checkExpiration } = require("../OpenAI/checkProductExpiration.js");
 
 const checkProduct = async (req, res) => {
-  let { productName } = req.params;
-  productName = capitalizeWords(productName);
-
-  if (!productName) {
+  let productNames = req.body;
+  if (!productNames || productNames.length < 1) {
     console.log(req.params);
     return res.status(400).json({ message: "Product Name is required" });
   }
-  try {
-    const product = await Product.findOne({ productName: productName });
-    if (product) {
-      console.log("Product exists");
-      const expiration = JSON.parse(await checkExpiration(productName));
+  productNames = productNames.map((productName) =>
+    capitalizeWords(productName)
+  );
 
-      console.log(expiration);
-    } else {
-      console.log("Product does not exist");
-    }
+  try {
+    console.log(productNames);
+    const expirationInfo = JSON.parse(await checkExpiration(productNames)); //gets expiration info from chatgpt
+
+    return res.status(200).json({ expirationInfo: expirationInfo });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Error: " + error });
