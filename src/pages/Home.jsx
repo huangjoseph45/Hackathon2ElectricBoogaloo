@@ -140,7 +140,6 @@ const Home = () => {
               name="Products"
               isLoading={isLoading}
               products={products}
-              setHoveredItem={setHoveredItem}
               clickFunc={addFoodItem}
               hoverColor="green"
             />
@@ -156,42 +155,12 @@ const Home = () => {
               name="Products to Validate"
               isLoading={isLoading}
               products={foodItems}
-              setHoveredItem={null}
               clickFunc={removeFoodItem}
               hoverColor="red"
             />
           </div>
 
           {/* Hovered Item Details */}
-          {hoveredItem && (
-            <div className="absolute top-1/2 left-[5rem] -translate-y-1/2 w-[20rem] border border-gray-300 bg-white rounded-md shadow-md p-3 text-slate-700">
-              <ul className="space-y-1">
-                <li>
-                  <span className="font-medium">Name:</span>{" "}
-                  {hoveredItem.productName}
-                </li>
-                <li>
-                  <span className="font-medium">ID:</span> {hoveredItem._id}
-                </li>
-                <li>
-                  <span className="font-medium">Category:</span>{" "}
-                  {hoveredItem.category}
-                </li>
-                <li>
-                  <span className="font-medium">Stock:</span>{" "}
-                  {hoveredItem.stockQuantity}
-                </li>
-                <li>
-                  <span className="font-medium">Price:</span>{" "}
-                  {`$${hoveredItem.price}`}
-                </li>
-                <li>
-                  <span className="font-medium">Expiration Date:</span>{" "}
-                  {new Date(hoveredItem.expirationDate).toDateString()}
-                </li>
-              </ul>
-            </div>
-          )}
 
           {/* Validate Button */}
           <div className="flex w-full items-center justify-center mt-6">
