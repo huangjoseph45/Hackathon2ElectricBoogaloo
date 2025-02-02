@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/Home";
+import { useEffect } from "react";
 
 function App() {
   const createProduct = async () => {
@@ -29,13 +30,16 @@ function App() {
 
   const checkProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3000/product/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(["beef", "milk", "eggs"]),
-      });
+      const response = await fetch(
+        "http://localhost:3000/product/check-product",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(["beef", "milk", "eggs"]),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

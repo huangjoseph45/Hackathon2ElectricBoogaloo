@@ -5,6 +5,19 @@ const Product = require("../schemas/Product.js");
 const ExpirationInfo = require("../schemas/ExpirationInfo.js");
 const { checkExpiration } = require("../OpenAI/checkProductExpiration.js");
 
+const fetchProducts = async (req, res) => {
+  try {
+    const products = await Product.find({}).lean();
+    console.log(products);
+    return res.status(200).json(products);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Error while fetching products: " + error });
+  }
+};
+
 const checkProduct = async (req, res) => {
   let productNames = req.body;
   if (!productNames || productNames.length < 1) {
@@ -87,4 +100,5 @@ function capitalizeWords(str) {
 module.exports = {
   checkProduct,
   createProduct,
+  fetchProducts,
 };

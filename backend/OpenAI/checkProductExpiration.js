@@ -3,10 +3,6 @@ const { zodResponseFormat } = require("openai/helpers/zod");
 const z = require("zod");
 const API_KEY = process.env.OPENAI_KEY;
 
-const openai = new OpenAI({
-  apiKey: API_KEY,
-});
-
 const responseFormat = z.object({
   items: z.array(
     z.object({
@@ -33,6 +29,10 @@ function withTimeout(promise, ms) {
 
 const checkExpiration = async (req) => {
   try {
+    const openai = new OpenAI({
+      apiKey: API_KEY,
+    });
+
     const date = new Date();
     const response = await withTimeout(
       openai.beta.chat.completions.parse({
@@ -40,7 +40,7 @@ const checkExpiration = async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant. You will evaluate the safety of the following foods and output a valid JSON array with evaluation details. Today's date is ${date.toDateString()}. Ensure the output is valid JSON.`,
+            content: `You are a helpful assistant. You will evaluate the safety of the following foods and output a valid JSON array with evaluation details. Today's date is ${date.toDateString()}. If the food item is not a valid food item, simply make isSafe false. Ensure the output is valid JSON.`,
           },
           {
             role: "user",
