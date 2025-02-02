@@ -9,8 +9,7 @@ const mapsRoutes = require("./routes/mapsRoutes.js");
 const app = express();
 const port = 3000;
 
-const MONGO_URI =
-  "mongodb+srv://jbh134:rvCFrdgypHtKK7Rq@jamal.xe68z.mongodb.net/?retryWrites=true&w=majority&appName=Jamal";
+const MONGO_URI = process.env.MONGO_URI_CONNECTION_STRING;
 
 const config = {
   authRequired: false,

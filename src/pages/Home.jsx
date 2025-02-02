@@ -291,9 +291,9 @@ const Home = () => {
             transition={{ duration: 0.5 }}
             className="bg-[#efefed]"
           >
-            <div className="flex flex-col lg:flex-row items-center justify-center p-4 pb-20 w-fit mx-auto gap-[4rem] h-[100vh]">
-              <div className="flex-col">
-                <p className="p-4 w-fit mx-auto text-xl font-semibold">
+            <div className="flex flex-col lg:flex-row items-center justify-center p-6 pb-20 w-fit mx-auto gap-[4rem] h-[100vh]">
+              <div className="flex-col relative">
+                <p className="p-4 w-fit mx-auto text-xl font-semibold absolute top-0 -translate-y-16 left-1/2 -translate-x-1/2">
                   Nearby Food Pantries
                 </p>
                 <div className="flex flex-col overflow-y-scroll outline outline-black rounded-md whitespace-nowrap max-h-[30rem] overflow-scroll mx-auto bg-white">
