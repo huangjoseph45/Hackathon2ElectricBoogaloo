@@ -32,7 +32,6 @@ const checkExpiration = async (req) => {
     const openai = new OpenAI({
       apiKey: API_KEY,
     });
-
     const date = new Date();
     const response = await withTimeout(
       openai.beta.chat.completions.parse({
@@ -44,7 +43,7 @@ const checkExpiration = async (req) => {
           },
           {
             role: "user",
-            content: `Food Items: ${req}`,
+            content: req,
           },
         ],
         temperature: 0.2,

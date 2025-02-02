@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
-const useCheckProducts = ({ productsToCheck }) => {
+const useCheckProducts = () => {
   const [isWaiting, setLoading] = useState(false);
   const [results, setResults] = useState(null);
 
-  const checkProducts = async () => {
+  const checkProducts = async (productsToCheck) => {
+    if (!productsToCheck || productsToCheck.length < 1) return;
     try {
-      console.log(productsToCheck);
       setLoading(true);
       const response = await fetch(
         "http://localhost:3000/product/check-product",
@@ -24,7 +24,7 @@ const useCheckProducts = ({ productsToCheck }) => {
       }
 
       const data = await response.json();
-      setResults(data);
+      setResults(data.expirationInfo);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -32,13 +32,9 @@ const useCheckProducts = ({ productsToCheck }) => {
     }
   };
 
-  const handleRecheck = async () => {
-    await checkProducts();
+  const handleRecheck = async (productsToCheck) => {
+    await checkProducts(productsToCheck);
   };
-
-  useEffect(() => {
-    if (productsToCheck) checkProducts();
-  }, []);
 
   return { isWaiting, results, recheckProducts: handleRecheck };
 };

@@ -19,19 +19,26 @@ const fetchProducts = async (req, res) => {
 };
 
 const checkProduct = async (req, res) => {
-  let productNames = req.body;
-  console.log(req.body);
-  if (!productNames || productNames.length < 1) {
-    console.log(req.params);
-    return res.status(400).json({ message: "Product Name is required" });
+  let products = req.body;
+
+  if (!products || products.length < 1) {
+    return res.status(400).json({ message: "Product is required" });
   }
-  productNames = productNames.map((productName) =>
-    capitalizeWords(productName)
-  );
 
   try {
-    console.log(productNames);
-    const expirationInfo = JSON.parse(await checkExpiration(productNames)); //gets expiration info from chatgpt
+    const productNames = JSON.stringify(
+      products.map((product) => {
+        return product.productName;
+      })
+    );
+    const expirationInfo = await checkExpiration(productNames); //gets expiration info from chatgpt
+
+    expirationInfo.map((item) => {
+      const match = products.find(
+        (product) => product.productName === item.foodName
+      );
+      item["id"] = match._id;
+    });
 
     return res.status(200).json({ expirationInfo: expirationInfo });
   } catch (error) {
@@ -90,13 +97,6 @@ const createProduct = async (req, res) => {
     return res.status(500).json({ message: "Error: " + error.message });
   }
 };
-
-function capitalizeWords(str) {
-  return str
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
 
 module.exports = {
   checkProduct,

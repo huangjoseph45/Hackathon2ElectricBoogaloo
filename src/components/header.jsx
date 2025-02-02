@@ -8,7 +8,7 @@ const Header = () => {
 
   return (
     <div
-      className={`w-[100vw] sticky top-0 left-0 box-border outline outline-b outline-2 outline-gray-300 p-1 flex flex-row justify-between px-7 z-10 bg-white`}
+      className={`w-[100vw] sticky top-0 left-0 box-border outline outline-b outline-2 outline-gray-300 p-1 flex flex-row justify-between px-7 z-10 bg-amber-50`}
     >
       <img
         src="/logo.webp" // Adjust the path if necessary (usually use a relative path)
