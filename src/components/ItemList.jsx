@@ -3,24 +3,8 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { useState } from "react";
 
 // Mapping function that returns the corresponding Tailwind hover class for a given color.
-const getHoverBgClass = (color) => {
-  const colorMap = {
-    blue: "hover:bg-blue-700",
-    red: "hover:bg-red-700",
-    green: "hover:bg-green-700",
-    purple: "hover:bg-purple-700",
-    // Add additional colors if needed.
-  };
-  return colorMap[color] || "";
-};
 
-function ItemList({
-  isLoading,
-  products,
-  clickFunc,
-  name,
-  hoverColor, // Expected values: "blue", "red", "green", "purple", etc.
-}) {
+function ItemList({ isLoading, products, clickFunc, name }) {
   const [hoveredItem, setHoveredItem] = useState(null);
 
   const copyToClipBoard = async (textToCopy) => {
@@ -34,25 +18,25 @@ function ItemList({
   };
 
   return (
-    <div className="min-h-[80vh] bg-gray-100 flex flex-col items-center ">
-      <label className="text-xl font-semibold text-slate-900 mb-4">
+    <div className="flex flex-col items-center ">
+      <label className="text-xl font-semibold text-slate-900 mb-4 whitespace-nowrap">
         {name}
       </label>
       <div className="flex flex-row items-center justify-center gap-4">
-        <div className="w-[11rem] lg:w-[20rem] border border-slate-900 rounded-md h-[30rem] max-h-[60rem] p-2 overflow-x-auto bg-white shadow-md overflow-y-scroll">
+        <div className="lg:w-[20rem] border border-slate-900 rounded-md h-[30rem] max-h-[60rem] p-4 overflow-x-auto bg-white shadow-md overflow-y-scroll ">
           {isLoading ? (
             <p>Loading...</p>
           ) : !products || products.length < 1 ? (
             <p>No Food Items Found</p>
           ) : (
             products.map((product) => (
-              <div key={`${product._id}-${hoverColor}`} className=" mb-2">
+              // Wrap each item in a relative container to position the popup correctly.
+              <div key={`${product._id}-${name}`} className="mb-2">
                 <div
                   onMouseEnter={() => setHoveredItem(product)}
                   onMouseLeave={() => setHoveredItem(null)}
-                  className={`border rounded-sm bg-gray-50 cursor-pointer transition-all duration-200 hover:text-white w-[10rem] lg:w-[15rem] ${getHoverBgClass(
-                    hoverColor
-                  )}`}
+                  // Integrate the dynamic hover color.
+                  className={`outline outline-gray-100 rounded-sm cursor-pointer transition-all duration-100 lg:w-full hover:outline-amber-400 hover:outline-[.2rem]`}
                 >
                   <div className="flex flex-row justify-between items-center">
                     <div
@@ -63,13 +47,14 @@ function ItemList({
                     </div>
                     <FontAwesomeIcon
                       icon={faCopy}
-                      className="px-4 bg-gray-300 bg-opacity-25 hover:bg-gray-600 rounded cursor-pointer"
+                      className="p-4 w-2 h-2 bg-gray-200 bg-opacity-15 hover:bg-gray-300 rounded cursor-pointer"
                       onClick={() => copyToClipBoard(product?._id)}
                     />
                   </div>
                 </div>
+                {/* Popup that appears on hover */}
                 {hoveredItem && hoveredItem === product && (
-                  <div className="absolute top-1/2 left-[5rem] -translate-y-1/2 w-[20rem] border border-gray-300 bg-white rounded-md shadow-md p-3 text-slate-700">
+                  <div className="-translate-x-[110%] -translate-y-[20%] w-[20rem] border border-gray-300 bg-white rounded-md shadow-md p-3 text-slate-700 absolute">
                     <ul className="space-y-1">
                       <li>
                         <span className="font-medium">Name:</span>{" "}

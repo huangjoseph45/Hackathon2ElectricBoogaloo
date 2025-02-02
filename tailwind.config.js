@@ -2,6 +2,13 @@
 export default {
   mode: "jit",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  safelist: [
+    "hover:bg-blue-700",
+    "hover:bg-red-700",
+    "hover:bg-green-700",
+    "hover:bg-purple-700",
+    // Add more hover classes if needed.
+  ],
   theme: {
     screens: {
       xs: "512px",

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import Map from "../components/map.jsx";
 import useFetchProducts from "../customHooks/useFetchProducts";
-import ItemList from "../../ItemList.jsx";
+import ItemList from "../components/ItemList.jsx";
 import Button from "../components/button.jsx";
 import useCheckProducts from "../customHooks/useCheckProducts.js";
 import { AnimatePresence, motion, time } from "framer-motion";
@@ -221,7 +221,7 @@ const Home = () => {
                 )}
               </div>
               <button
-                className="absolute left-1/2 -translate-x-1/2 top-full w-1/2 border p-2 rounded-lg border-slate-800 hover:bg-slate-900 hover:text-white transition-all duration-200"
+                className="absolute left-1/2 -translate-x-1/2 top-full w-1/2 border p-2 rounded-sm border-slate-800 hover:bg-slate-900 hover:text-white transition-all duration-200"
                 onClick={getNearbyFoodPantries}
               >
                 Find Nearby Food Pantries
