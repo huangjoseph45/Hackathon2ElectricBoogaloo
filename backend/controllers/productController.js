@@ -20,6 +20,7 @@ const fetchProducts = async (req, res) => {
 
 const checkProduct = async (req, res) => {
   let productNames = req.body;
+  console.log(req.body);
   if (!productNames || productNames.length < 1) {
     console.log(req.params);
     return res.status(400).json({ message: "Product Name is required" });

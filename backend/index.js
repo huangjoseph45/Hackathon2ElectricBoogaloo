@@ -1,33 +1,42 @@
-require("dotenv").config();
-
 const express = require("express");
-
-const MONGO_URI = process.env.MONGO_URI_CONNECTION_STRING;
-const port = process.env.PORT || 3000;
-const productRoutes = require("./routes/productRoutes.js");
+const { auth, requiresAuth } = require("express-openid-connect");
+const mongoose = require("mongoose");
 const cors = require("cors");
 
+const productRoutes = require("./routes/productRoutes.js");
+
 const app = express();
+const port = 3000;
 
-const mongoose = require("mongoose");
+const MONGO_URI =
+  "mongodb+srv://jbh134:rvCFrdgypHtKK7Rq@jamal.xe68z.mongodb.net/?retryWrites=true&w=majority&appName=Jamal";
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+const config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: "bbnaAgHpUZLRq063k1U7_ebkjQSlTB9uDI_qkpK6MF0l5G1bHQiGpcbLzZx9MB59",
+  baseURL: "http://localhost:5173",
+  clientID: "Aj7IoPUpsl0nADIn0HUzdezyd2nXCFrQ",
+  issuerBaseURL: "https://dev-eq8gecr3aifn0jqv.us.auth0.com",
+};
+
+app.use(auth(config));
 
 app.use(express.json());
-
 app.use(
   cors({
-    methods: ["GET", "POST"], // Allow specific methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-    credentials: true, // Allow cookies & auth headers
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
 app.get("/", (req, res) => {
-  res.send("Hello, Express!");
+  res.send(req.oidc.isAuthenticated() ? "Logged in" : "Logged out");
+});
+
+app.get("/profile", requiresAuth(), (req, res) => {
+  res.json(req.oidc.user);
 });
 
 app.use("/product", productRoutes);
@@ -37,6 +46,14 @@ app.use((err, req, res, next) => {
   res.status(500).send("Internal Server Error");
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(port, () => {
+      console.log(`Server is running on http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });

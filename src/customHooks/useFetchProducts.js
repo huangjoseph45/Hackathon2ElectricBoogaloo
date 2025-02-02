@@ -20,17 +20,22 @@ const useFetchProducts = () => {
 
       const data = await response.json();
       setProducts(data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error("Error:", error.message);
     }
   };
 
+  const handleRefetch = async () => {
+    await fetchProducts();
+  };
+
   useEffect(() => {
     fetchProducts();
-    setLoading(false);
   }, []);
 
-  return { isLoading, products, refetch: fetchProducts };
+  return { isLoading, products, refetch: handleRefetch };
 };
 
 export default useFetchProducts;
