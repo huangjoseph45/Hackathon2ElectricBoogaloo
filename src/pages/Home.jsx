@@ -229,7 +229,7 @@ const Home = () => {
             </div>
 
             {/* Explanation or Image */}
-            {showDescription && showDescription.length > 0 ? (
+            {showDescription && showDescription.length > 0 && (
               <div className="flex flex-col gap-2 mx-4">
                 <p className="text-xl font-semibold text-slate-800">
                   Explanation
@@ -238,12 +238,6 @@ const Home = () => {
                   {showDescription}
                 </div>
               </div>
-            ) : (
-              <img
-                src="public/stock1.jpg"
-                alt="stock1"
-                className="w-[35rem] h-fit max-h-[40rem] hidden lg:block rounded-md shadow-sm"
-              />
             )}
           </motion.div>
         )}
@@ -265,7 +259,7 @@ const Home = () => {
                 <p className="p-4 w-fit mx-auto text-xl font-semibold absolute top-0 -translate-y-16 left-1/2 -translate-x-1/2">
                   Nearby Food Pantries
                 </p>
-                <div className="flex flex-col overflow-y-scroll outline outline-black rounded-md whitespace-nowrap max-h-[30rem] overflow-scroll mx-auto bg-white">
+                <div className="flex flex-col overflow-y-scroll outline outline-black rounded-md whitespace-nowrap max-h-[30rem] overflow-scroll mx-auto bg-white p-2">
                   {locations &&
                     locations.length > 0 &&
                     locations.map((location) => {
@@ -279,7 +273,7 @@ const Home = () => {
                       return (
                         <li
                           key={location.place_id}
-                          className="list-none p-2  cursor-pointer hover:bg-gray-200 rounded-lg w-[30rem]"
+                          className="list-none p-2  cursor-pointer hover:bg-gray-100 rounded-md w-[30rem]"
                           onClick={handleClicked}
                         >
                           {shortenedName}

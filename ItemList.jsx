@@ -39,7 +39,7 @@ function ItemList({
         {name}
       </label>
       <div className="flex flex-row items-center justify-center gap-4">
-        <div className="w-[11rem] lg:w-[20rem] border border-slate-900 rounded-md min-h-[30rem] h-[60vh] max-h-[60rem] p-2 overflow-x-auto bg-white shadow-md">
+        <div className="w-[11rem] lg:w-[20rem] border border-slate-900 rounded-md h-[30rem] max-h-[60rem] p-2 overflow-x-auto bg-white shadow-md overflow-y-scroll">
           {isLoading ? (
             <p>Loading...</p>
           ) : !products || products.length < 1 ? (
