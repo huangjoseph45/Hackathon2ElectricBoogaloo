@@ -34,22 +34,23 @@ function ItemList({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center mt-8 mb-4 gap-2">
-      <label className="text-xl font-semibold text-slate-900">{name}</label>
+    <div className="min-h-[80vh] bg-gray-100 flex flex-col items-center ">
+      <label className="text-xl font-semibold text-slate-900 mb-4">
+        {name}
+      </label>
       <div className="flex flex-row items-center justify-center gap-4">
-        <div className="w-[11rem] lg:w-[20rem] border border-slate-900 rounded-md h-[60vh] max-h-[60rem] p-2 overflow-x-auto">
+        <div className="w-[11rem] lg:w-[20rem] border border-slate-900 rounded-md h-[60vh] max-h-[60rem] p-2 overflow-x-auto bg-white shadow-md">
           {isLoading ? (
             <p>Loading...</p>
           ) : !products || products.length < 1 ? (
             <p>No Food Items Found</p>
           ) : (
             products.map((product) => (
-              <>
+              <div key={`${product._id}-${hoverColor}`} className=" mb-2">
                 <div
-                  key={`${product._id}-${hoverColor}`}
                   onMouseEnter={() => setHoveredItem(product)}
                   onMouseLeave={() => setHoveredItem(null)}
-                  className={`border rounded-sm bg-orange-300 cursor-pointer transition-all duration-200 hover:text-white w-[10rem] lg:w-[15rem] ${getHoverBgClass(
+                  className={`border rounded-sm bg-gray-50 cursor-pointer transition-all duration-200 hover:text-white w-[10rem] lg:w-[15rem] ${getHoverBgClass(
                     hoverColor
                   )}`}
                 >
@@ -67,7 +68,7 @@ function ItemList({
                     />
                   </div>
                 </div>
-                {hoveredItem && (
+                {hoveredItem && hoveredItem === product && (
                   <div className="absolute top-1/2 left-[5rem] -translate-y-1/2 w-[20rem] border border-gray-300 bg-white rounded-md shadow-md p-3 text-slate-700">
                     <ul className="space-y-1">
                       <li>
@@ -97,7 +98,7 @@ function ItemList({
                     </ul>
                   </div>
                 )}
-              </>
+              </div>
             ))
           )}
         </div>
