@@ -15,6 +15,7 @@ const productSchema = new mongoose.Schema(
         "Produce",
         "Meat",
         "Bakery",
+        "Starch",
         "Beverages",
         "Snacks",
         "Frozen Foods",

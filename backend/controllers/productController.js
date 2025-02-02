@@ -8,7 +8,6 @@ const { checkExpiration } = require("../OpenAI/checkProductExpiration.js");
 const fetchProducts = async (req, res) => {
   try {
     const products = await Product.find({}).lean();
-    console.log(products);
     return res.status(200).json(products);
   } catch (error) {
     console.error(error);
@@ -28,11 +27,15 @@ const checkProduct = async (req, res) => {
   try {
     const productNames = JSON.stringify(
       products.map((product) => {
-        return product.productName;
+        return [product.productName, product.expirationDate];
       })
     );
     const expirationInfo = await checkExpiration(productNames); //gets expiration info from chatgpt
-
+    if (!expirationInfo) {
+      return res
+        .status(500)
+        .message({ message: "Failed to generate response" });
+    }
     expirationInfo.map((item) => {
       const match = products.find(
         (product) => product.productName === item.foodName
@@ -61,8 +64,8 @@ const createProduct = async (req, res) => {
 
   try {
     const productInfo = {
-      productName: capitalizeWords(productName),
-      category: capitalizeWords(category),
+      productName: productName,
+      category: category,
       ...(isCanned !== undefined && { isCanned }),
       ...(stockQuantity !== undefined && { stockQuantity }),
       ...(expirationDate !== undefined && { expirationDate }),

@@ -12,7 +12,10 @@ function App() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ productName: "Beef", category: "Meat" }),
+          body: JSON.stringify({
+            productName: "Canned Tuna",
+            category: "Meat",
+          }),
         }
       );
 
@@ -26,6 +29,10 @@ function App() {
       console.error("Error:", error.message);
     }
   };
+
+  useEffect(() => {
+    createProduct();
+  });
 
   return (
     <BrowserRouter>

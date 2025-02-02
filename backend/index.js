@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const productRoutes = require("./routes/productRoutes.js");
+const mapsRoutes = require("./routes/mapsRoutes.js");
 
 const app = express();
 const port = 3000;
@@ -40,6 +41,7 @@ app.get("/profile", requiresAuth(), (req, res) => {
 });
 
 app.use("/product", productRoutes);
+app.use("/maps", mapsRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

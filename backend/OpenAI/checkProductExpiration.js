@@ -39,7 +39,7 @@ const checkExpiration = async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant. You will evaluate the safety of the following foods and output a valid JSON array with evaluation details. Today's date is ${date.toDateString()}. If the food item is not a valid food item, simply make isSafe false. Ensure the output is valid JSON.`,
+            content: `You are a helpful assistant. You will evaluate the safety of the following foods and output a valid JSON array with evaluation details. The input data is in the format of [product name, expiration date]. Your evaluation with will be based on how safe the food is to donate to charity. Take in to consideration that food may be donated even after expiration if it is safe. Explain in 3-5 sentences why or why not the food is safe. Take in to consideration refrigerability and food should last at the very minumum 2 weeks. Today's date is ${date.toDateString()}. If the food item is not a valid food item, simply make isSafe false. Ensure the output is valid JSON.`,
           },
           {
             role: "user",
@@ -47,7 +47,7 @@ const checkExpiration = async (req) => {
           },
         ],
         temperature: 0.2,
-        max_tokens: 300, // Increased from 150 to allow a complete response
+        max_tokens: 1200, // Increased from 150 to allow a complete response
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
