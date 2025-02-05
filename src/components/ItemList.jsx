@@ -22,8 +22,8 @@ function ItemList({ isLoading, products, clickFunc, name }) {
       <label className="text-xl font-semibold text-slate-900 mb-4 whitespace-nowrap">
         {name}
       </label>
-      <div className="flex flex-row items-center justify-center gap-4">
-        <div className="lg:w-[20rem] border border-slate-900 rounded-md h-[30rem] max-h-[60rem] p-4 overflow-x-auto bg-white shadow-md overflow-y-scroll ">
+      <div className="flex flex-row items-center justify-center gap-4 relative">
+        <div className="lg:w-[20rem] border border-slate-900 rounded-md h-[30rem] max-h-[60rem] p-4 overflow-x-auto bg-white shadow-md ">
           {isLoading ? (
             <p>Loading...</p>
           ) : !products || products.length < 1 ? (
