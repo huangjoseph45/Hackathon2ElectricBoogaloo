@@ -1,4 +1,5 @@
 import Header from "../components/header";
+import DemoBanner from "../components/demoBanner";
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
@@ -7,17 +8,17 @@ import useFetchProducts from "../customHooks/useFetchProducts";
 import ItemList from "../components/ItemList.jsx";
 import Button from "../components/button.jsx";
 import useCheckProducts from "../customHooks/useCheckProducts.js";
-import { AnimatePresence, motion, time } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import useFetchLocations from "../customHooks/useFetchLocations";
+import { DEMO_CENTER, isDemoMode } from "../data/demoCatalog";
 
 const Home = () => {
   const [foodItems, setFoodItems] = useState([]);
-  const [hoveredItem, setHoveredItem] = useState(null);
   const [showDescription, setShowDescription] = useState("");
-  const { isLoading, products, refetch } = useFetchProducts();
+  const { isLoading, products } = useFetchProducts();
   const { isWaiting, results, recheckProducts, setWaiting } =
     useCheckProducts();
-  const { locations, isPending, refetchLocations } = useFetchLocations();
+  const { locations, refetchLocations } = useFetchLocations();
   const [currLoc, setCurrLoc] = useState(null);
   const [markerName, setMarkerName] = useState(null);
 
@@ -31,8 +32,14 @@ const Home = () => {
   };
 
   const startup = async () => {
-    const location = await getLocation();
-    setCurrLoc({ lat: location.lat, lng: location.lng });
+    try {
+      const location = await getLocation();
+      setCurrLoc({ lat: location.lat, lng: location.lng });
+    } catch {
+      // Geolocation denied or unavailable: center on the demo location so
+      // the map still works instead of leaving the page without one.
+      setCurrLoc(DEMO_CENTER);
+    }
   };
 
   useEffect(() => {
@@ -72,21 +79,25 @@ const Home = () => {
   }
 
   const getNearbyFoodPantries = async () => {
-    if ("geolocation" in navigator) {
-      setWaiting(true);
-
+    if (!("geolocation" in navigator)) {
+      alert("Location is not available");
+      return;
+    }
+    setWaiting(true);
+    try {
       const location = await getLocation();
-
-      console.log(location.lat, location.lng);
       refetchLocations(
         "food pantries, soup kitchen",
         location.lat,
         location.lng
       );
-    } else {
-      alert("Location is not available");
+    } catch {
+      // Geolocation denied: search around the demo location instead of
+      // leaving the spinner up. The demo pantry pins are labeled as such.
+      refetchLocations("food pantries, soup kitchen", DEMO_CENTER.lat, DEMO_CENTER.lng);
+    } finally {
+      setWaiting(false);
     }
-    setWaiting(false);
   };
   useEffect(() => {
     if (locations && locations.length > 0 && sectionRef.current) {
@@ -99,13 +110,8 @@ const Home = () => {
   }, [locations]);
 
   const submitFunc = () => {
-    console.log(foodItems);
     recheckProducts(foodItems);
   };
-
-  useEffect(() => {
-    console.log("Selected food items:", foodItems);
-  }, [foodItems]);
 
   useEffect(() => {
     if (results)
@@ -119,6 +125,7 @@ const Home = () => {
   return (
     <>
       <Header />
+      <DemoBanner />
       {/* Spinner Overlay */}
       {isWaiting && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10 z-50">
@@ -183,6 +190,13 @@ const Home = () => {
             {/* Results List */}
             <div className="relative flex flex-col items-center gap-4">
               <p className="text-2xl font-semibold text-slate-800">Results</p>
+              {isDemoMode() && (
+                <p className="text-sm text-slate-500 max-w-[35rem] text-center">
+                  Sample judgments for demonstration only — not AI assessments
+                  and not a safety verdict. Never decide whether food is safe
+                  to eat or donate from this demo.
+                </p>
+              )}
               <div className="border border-gray-300 rounded-md shadow-sm p-4 flex flex-col items-center mb-4 bg-white w-full max-w-[35rem] min-h-[20rem] overflow-scroll h-[35rem]">
                 {/* Header Row */}
                 <div className="w-full flex items-center gap-2 p-4 bg-gray-50 rounded-md mb-2">
@@ -263,7 +277,11 @@ const Home = () => {
                   {locations &&
                     locations.length > 0 &&
                     locations.map((location) => {
-                      if (!location.business_status === "OPERATIONAL") return;
+                      // The old check was `!location.business_status ===
+                      // "OPERATIONAL"`, which is always false (the `!`
+                      // binds first), so closed pantries were never
+                      // filtered out.
+                      if (location.business_status !== "OPERATIONAL") return null;
 
                       const shortenedName = location.name.split("-")[0];
                       const handleClicked = () => {
@@ -283,7 +301,11 @@ const Home = () => {
                 </div>
               </div>
 
-              <Map location={currLoc} markerName={markerName} />
+              <Map
+                location={currLoc}
+                markerName={markerName}
+                locations={locations}
+              />
             </div>
           </motion.div>
         )}{" "}

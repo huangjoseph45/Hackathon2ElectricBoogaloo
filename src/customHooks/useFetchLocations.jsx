@@ -1,4 +1,10 @@
 import { useState } from "react";
+import API_BASE from "../config";
+import {
+  demoPantries,
+  markDemoMode,
+  clearDemoMode,
+} from "../data/demoCatalog";
 
 const useFetchLocations = () => {
   const [isPending, setIsPending] = useState(false);
@@ -8,11 +14,10 @@ const useFetchLocations = () => {
     try {
       setIsPending(true);
 
-      const url = `http://localhost:3000/maps?lat=${encodeURIComponent(
+      const url = `${API_BASE}/maps?lat=${encodeURIComponent(
         lat
       )}&lng=${encodeURIComponent(lng)}&query=${encodeURIComponent(query)}`;
 
-      console.log(url);
       const response = await fetch(url, {
         method: "GET", // Changed to GET for sending query params in URL
         headers: {
@@ -20,15 +25,25 @@ const useFetchLocations = () => {
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch locations: ${response.statusText}`);
+      if (
+        !response.ok ||
+        !response.headers.get("content-type")?.includes("application/json")
+      ) {
+        // Live backend unreachable: show the sample pantries near the
+        // demo location instead of an empty map.
+        setLocations(demoPantries);
+        markDemoMode();
+        setIsPending(false);
+        return;
       }
 
       const data = await response.json();
-      console.log("Google Places API response:", data);
+      clearDemoMode();
       setLocations(data.results);
     } catch (error) {
-      console.error("Error fetching locations:", error);
+      setLocations(demoPantries);
+      markDemoMode();
+      console.warn("Live backend unreachable, serving demo pantries:", error);
     } finally {
       setIsPending(false);
     }

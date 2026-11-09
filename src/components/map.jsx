@@ -1,13 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import useFetchLocations from "../customHooks/useFetchLocations";
-
-const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -16,62 +13,67 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-function Map({ location, markerName }) {
+// Shows the user's location plus a marker per pantry. Markers are tracked
+// and cleared on every update; the old version added a new marker on each
+// location change and never removed the old ones.
+function Map({ location, markerName, locations = [] }) {
   const mapRef = useRef(null);
   const containerRef = useRef(null);
+  const markersRef = useRef([]);
 
   useEffect(() => {
-    if (!location) return; // do nothing if location is null/undefined
-
-    if (!containerRef.current) return;
-    if (!markerName || markerName === "") {
-      markerName = "Your Location";
-    }
+    if (!location || !containerRef.current) return;
 
     if (!mapRef.current) {
-      // Map is not created yet, so create it
-      const { lat, lng } = location;
-      const mapInstance = L.map(containerRef.current).setView([lat, lng], 14);
+      const mapInstance = L.map(containerRef.current).setView(
+        [location.lat, location.lng],
+        14
+      );
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(mapInstance);
 
-      L.marker([lat, lng])
-        .addTo(mapInstance)
-        .bindPopup(`Marker at (${lat}, ${lng})`)
-        .openPopup();
-
       mapRef.current = mapInstance;
     } else {
-      // Map already exists, so just re-center it
       mapRef.current.setView([location.lat, location.lng], 14);
-
-      // If you want to move an existing marker instead of creating a new one:
-      // - store the marker in a ref as well
-      // - or remove the old marker and add a new one here
-      L.marker([location.lat, location.lng])
-        .addTo(mapRef.current)
-        .bindPopup(markerName)
-        .openPopup();
     }
 
-    // Optional: If you do NOT want to destroy and recreate the map on every update,
-    // do NOT remove it in this cleanup. Only remove it on final unmount.
+    // Clear the previous markers before drawing the new set.
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+    const youAreHere = L.marker([location.lat, location.lng])
+      .addTo(mapRef.current)
+      .bindPopup(markerName || "Your Location");
+    markersRef.current.push(youAreHere);
+
+    locations.forEach((place) => {
+      const placeLoc = place.geometry?.location;
+      if (!placeLoc) return;
+      const marker = L.marker([placeLoc.lat, placeLoc.lng])
+        .addTo(mapRef.current)
+        .bindPopup(place.name);
+      markersRef.current.push(marker);
+    });
+    youAreHere.openPopup();
+  }, [location, markerName, locations]);
+
+  useEffect(() => {
+    // Destroy the map only on unmount.
     return () => {
-      // If you want to remove the map every time the location changes,
-      // you'd do mapRef.current.remove(). But usually, you'd keep the same mapRef
-      // for performance reasons. So you might leave this out and only remove on unmount.
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [location, markerName]); // <-- add location in the dependency array
+  }, []);
 
   return (
-    <>
-      <div className="w-[30rem] h-[30rem] border border-black">
-        <div ref={containerRef} className="w-full h-full" />
-      </div>
-    </>
+    <div className="w-[30rem] h-[30rem] border border-black">
+      <div ref={containerRef} className="w-full h-full" />
+    </div>
   );
 }
 

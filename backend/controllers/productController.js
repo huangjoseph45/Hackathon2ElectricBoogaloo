@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const mongoose = require("mongoose");
 const Product = require("../schemas/Product.js");
-const ExpirationInfo = require("../schemas/ExpirationInfo.js");
+const ExpirationInfo = require("../schemas/expirationInfo.js");
 const { checkExpiration } = require("../OpenAI/checkProductExpiration.js");
 
 const fetchProducts = async (req, res) => {
@@ -34,13 +34,16 @@ const checkProduct = async (req, res) => {
     if (!expirationInfo) {
       return res
         .status(500)
-        .message({ message: "Failed to generate response" });
+        .json({ message: "Failed to generate response" });
     }
     expirationInfo.map((item) => {
       const match = products.find(
         (product) => product.productName === item.foodName
       );
-      item["id"] = match._id;
+      // The frontend reads checkedItem._id (Home.jsx), so attach the id
+      // under that key. A judgment with no matching product keeps no id
+      // instead of throwing on match._id.
+      if (match) item["_id"] = match._id;
     });
 
     return res.status(200).json({ expirationInfo: expirationInfo });

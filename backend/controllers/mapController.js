@@ -8,11 +8,15 @@ const getLocations = async (req, res) => {
     return res.status(400).json({ message: "Missing essential data" });
   }
 
-  const URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json
-?location=${lat},${lng}
-&keyword=${encodeURIComponent(query)}
-&rankby=distance
-&key=${encodeURIComponent(API_KEY)}`;
+  // Build the URL without line breaks: the old template literal spanned
+  // lines, so the URL contained literal newline characters and the request
+  // could never be valid.
+  const URL =
+    "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
+    `?location=${lat},${lng}` +
+    `&keyword=${encodeURIComponent(query)}` +
+    "&rankby=distance" +
+    `&key=${encodeURIComponent(API_KEY)}`;
 
   try {
     const response = await fetch(URL, {

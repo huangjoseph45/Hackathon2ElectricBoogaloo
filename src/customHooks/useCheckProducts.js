@@ -1,4 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import API_BASE from "../config";
+import {
+  demoJudgmentsFor,
+  markDemoMode,
+  clearDemoMode,
+} from "../data/demoCatalog";
 
 const useCheckProducts = () => {
   const [isWaiting, setWaiting] = useState(false);
@@ -8,27 +14,36 @@ const useCheckProducts = () => {
     if (!productsToCheck || productsToCheck.length < 1) return;
     try {
       setWaiting(true);
-      const response = await fetch(
-        "http://localhost:3000/product/check-product",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(productsToCheck),
-        }
-      );
+      const response = await fetch(`${API_BASE}/product/check-product`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productsToCheck),
+      });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (
+        !response.ok ||
+        !response.headers.get("content-type")?.includes("application/json")
+      ) {
+        // Live backend unreachable: answer with the sample judgments for
+        // the selected demo products. These are labeled as samples in the
+        // UI; they are not AI assessments.
+        setResults(demoJudgmentsFor(productsToCheck));
+        markDemoMode();
+        setWaiting(false);
+        return;
       }
 
       const data = await response.json();
+      clearDemoMode();
       setResults(data.expirationInfo);
       setWaiting(false);
     } catch (error) {
       setWaiting(false);
-      console.error("Error:", error.message);
+      setResults(demoJudgmentsFor(productsToCheck));
+      markDemoMode();
+      console.warn("Live backend unreachable, serving demo judgments:", error);
     }
   };
 
